@@ -3,8 +3,8 @@
 return [
     'db' => [
         'hostname' => 'localhost',
-        'user' => 'root',
-        'pass' => 'rootpass',
-        'name' => 'test',
+        'user' => 'gampo006_kurs',
+        'pass' => 'testpassword',
+        'name' => 'gampo006_kurs',
     ]
 ];

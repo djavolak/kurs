@@ -1,14 +1,10 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+include("bootstrap.php");
 
-$config = include("config.php");
-include("functions.php");
+$user = getUserFromDb($db, $_GET['userId']);
+//$user = (array) getUserFromFile((int) $_GET['userId']);
 
-$db = connectToDatabase($config['db']);
-
-$user = ['userId' => 1, 'fullname' => 'Milos Jovanov', 'gender' => 2, 'birthdate' => '08-11-1983'];
 
 ?>
 <!DOCTYPE html>

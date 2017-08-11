@@ -1,4 +1,7 @@
 <?php
+	//logOut();
+	//populateStorage();
+	//die();
 
     /**
      * @param $params
@@ -15,28 +18,64 @@
             var_dump($e->getCode());
             var_dump($e->getTrace());
             die();
+
         }
 
         return $pdo;
     }
 
-    function getUser(Pdo $dbConnection, $userId) {
-        $userId = addslashes($userId);
-        $sql = "SELECT * FROM user WHERE userId = ? {$userId}";
-
-        return $dbConnection->query($sql)->fetchAll(\Pdo::FETCH_ASSOC);
-    }
-
-    function getUsers(Pdo $dbConnection) {
+    function getUsersFromDb(Pdo $dbConnection) {
         $sql = "SELECT * FROM user";
 
-        return $dbConnection->query($sql)->fetchAll(\Pdo::FETCH_ASSOC);
+        return $dbConnection->query($sql)->fetchAll();
     }
 
-    function saveUserToDb(Pdo $dbConnection, $params) {
-        $sql = "INSERT INTO user VALUES(NULL , '{$params['fullname']}', '{$params['gender']}', '{$params['email']}', '{$params['birthdate']}', NOW())";
+    function getUserFromDb(Pdo $dbConnection, $userId) {
+        $sql = "SELECT * FROM user WHERE userId = {$userId}";
 
-        return $dbConnection->exec($sql);
+        return $dbConnection->query($sql)->fetch();
     }
+
+	function getUsersFromFile() {
+		return json_decode(file_get_contents('storage.json'));
+	}
+
+    function getUserFromFile($userId) {
+        foreach (getUsersFromFile() as $user) {
+            if ($user->userId === $userId) {
+                return $user;
+            }
+        }
+
+        throw new \Exception('korisnik nije pronadjen.');
+    }
+
+	function saveUserToFile($params) {
+		$users = getUsersFromFile();
+		if (!$users) {
+            $users = array();
+        }
+
+		$user = new StdClass();
+		$user->userId = count($users);
+		$user->fullname = $params['fullname'];
+		$user->email = $params['email'];
+		$user->birthdate = $params['birthdate'];
+		$user->gender = $params['gender'];
+        $users[] = $user;
+
+		return file_put_contents('storage.json', json_encode($users));
+	}
+
+    function saveUserToDb(Pdo $dbConnection, $params){
+        $sql = "INSERT INTO user VALUES (NULL ,'{$params['fullname']}', '{$params['gender']}', '{$params['email']}', '{$params['birthdate']}', NOW())";
+
+        if (!$dbConnection->exec($sql)) {
+            throw new \Exception($dbConnection->errorInfo()[2]);
+        }
+
+        return  true;
+    }
+
 
 ?>

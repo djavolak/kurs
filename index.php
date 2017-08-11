@@ -1,15 +1,9 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+include("bootstrap.php");
 
-$config = include("config.php");
-include("functions.php");
-
-$db = connectToDatabase($config['db']);
-	
-$users[0] = ['userId' => 1, 'fullname' => 'Milos Jovanov', 'gender' => 2, 'birthdate' => '08-11-1983'];
-$users[1] = ['userId' => 2, 'fullname' => 'Aco Gagić', 'gender' => 2, 'birthdate' => '08-11-1983'];
+$users = getUsersFromDb($db);
+//$users = getUsersFromFile();
 
 ?>
 <!DOCTYPE html>
@@ -28,8 +22,13 @@ $users[1] = ['userId' => 2, 'fullname' => 'Aco Gagić', 'gender' => 2, 'birthdat
                 <h2>Spisak učesnika kursa:</h2>
                 <ul>
                     <?php foreach ($users as $user): ?>
+                    <?php
+                        // if file storage is used, cast user to array, since it will be of stdClass type
+                        if (!is_array($user)) { $user = (array) $user; }
+                    ?>
                     <li>
-                        <a href="list.php?userId=<?=$user['userId']?>" title="<?=$user['fullname']?>"><?=$user['fullname']?></a> | <?=$user['birthdate']?>
+                        <a href="details.php?userId=<?=$user['userId']?>" title="<?=$user['fullname']?>"><?=$user['fullname']?></a> |
+                        <?=date('d/m/Y', strtotime($user['birthdate']))?>
                     </li>
                     <?php endforeach; ?>
                 </ul>
